@@ -1,7 +1,9 @@
 # Binaries
 gh-rdm
+bin/
 *.exe
 dist/
+coverage.out
 
 # IDE
 .idea/
