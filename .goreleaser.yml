@@ -1,0 +1,21 @@
+project_name: gh-rdm
+
+builds:
+  - binary: gh-rdm
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - format: binary
+
+release:
+  prerelease: auto
+
+changelog:
+  sort: asc
