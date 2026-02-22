@@ -20,6 +20,7 @@ func Execute(ctx context.Context, userMessages *log.Logger) error {
 		newPasteCmd(),
 		newOpenCmd(),
 		newSocketCmd(),
+		newSetupCmd(),
 	)
 
 	return rootCmd.ExecuteContext(ctx)

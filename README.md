@@ -18,6 +18,16 @@ gh extension install maxbeizer/gh-rdm
 
 ## Quick start
 
+Run the interactive setup wizard to get everything configured:
+
+```bash
+gh rdm setup
+```
+
+This walks you through starting the server, configuring SSH forwarding in `~/.ssh/config`, and setting up integrations (neovim, gh CLI browser, shell aliases).
+
+### Or do it manually
+
 Start the server and SSH into a remote host with clipboard forwarding in one shot:
 
 ```bash
