@@ -2,7 +2,7 @@
 
 A [`gh`](https://cli.github.com/) CLI extension that forwards clipboard (copy/paste) and `open` commands from remote SSH sessions back to your local machine.
 
-Inspired by [BlakeWilliams/remote-development-manager](https://github.com/BlakeWilliams/remote-development-manager).
+Stolen from [BlakeWilliams/remote-development-manager](https://github.com/BlakeWilliams/remote-development-manager) and repackaged as a `gh` extension.
 
 ## How it works
 
@@ -14,6 +14,20 @@ Inspired by [BlakeWilliams/remote-development-manager](https://github.com/BlakeW
 
 ```bash
 gh extension install maxbeizer/gh-rdm
+```
+
+## Quick start
+
+Start the server and SSH into a remote host with clipboard forwarding in one shot:
+
+```bash
+gh rdm server & ssh -R 127.0.0.1:7391:$(gh rdm socket) user@remote-host
+```
+
+For GitHub Codespaces:
+
+```bash
+gh rdm server & gh cs ssh -- -R 127.0.0.1:7391:$(gh rdm socket)
 ```
 
 ## Usage
@@ -37,12 +51,6 @@ Forward the local socket to the remote host so client commands can reach it:
 
 ```bash
 ssh -R 127.0.0.1:7391:$(gh rdm socket) user@remote-host
-```
-
-For GitHub Codespaces:
-
-```bash
-gh cs ssh -- -R 127.0.0.1:7391:$(gh rdm socket)
 ```
 
 ### Client (remote machine)
@@ -106,6 +114,9 @@ alias open="gh rdm open"
 ## Development
 
 ```bash
-go build -o gh-rdm .
-go test ./...
+make help          # see all targets
+make build         # build binary
+make test          # run tests
+make ci            # build + vet + test-race
+make install-local # install extension from checkout
 ```
