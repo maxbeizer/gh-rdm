@@ -2,6 +2,8 @@ project_name: gh-rdm
 
 builds:
   - binary: gh-rdm
+    env:
+      - CGO_ENABLED=0
     goos:
       - darwin
       - linux

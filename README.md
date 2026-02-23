@@ -1,5 +1,7 @@
 # gh-rdm — Remote Development Manager
 
+> **⚠️ Experimental** — This extension is under active development. Expect rough edges.
+
 A [`gh`](https://cli.github.com/) CLI extension that forwards clipboard (copy/paste) and `open` commands from remote SSH sessions back to your local machine.
 
 Stolen from [BlakeWilliams/remote-development-manager](https://github.com/BlakeWilliams/remote-development-manager) and repackaged as a `gh` extension.
