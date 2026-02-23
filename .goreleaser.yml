@@ -12,11 +12,8 @@ builds:
       - -s -w
 
 archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}-{{ .Arch }}"
-    format_overrides:
-      - goos: windows
-        format: zip
+  - format: binary
+    name_template: "{{ .ProjectName }}_{{ .Os }}-{{ .Arch }}"
 
 release:
   prerelease: auto
