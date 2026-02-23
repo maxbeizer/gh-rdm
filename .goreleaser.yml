@@ -13,6 +13,7 @@ builds:
 
 archives:
   - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}-{{ .Arch }}"
     format_overrides:
       - goos: windows
         format: zip
