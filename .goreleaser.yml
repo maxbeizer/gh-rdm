@@ -12,7 +12,10 @@ builds:
       - -s -w
 
 archives:
-  - format: binary
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
 
 release:
   prerelease: auto
