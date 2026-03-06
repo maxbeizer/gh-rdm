@@ -88,7 +88,7 @@ func fetchImage(cmd *cobra.Command, commandName string, outputDir string) error 
 	}
 
 	fmt.Fprintf(cmd.OutOrStdout(), "📸 Saved: %s (%d bytes)\n", outPath, len(data))
-	fmt.Fprintf(cmd.OutOrStdout(), "@ %s\n", outPath)
+	fmt.Fprintf(cmd.OutOrStdout(), "@%s\n", outPath)
 
 	return nil
 }
