@@ -98,7 +98,7 @@ Use `gh rdm screenshot` to pull images through the SSH tunnel:
 gh rdm screenshot
 # Output:
 #   📸 Saved: /tmp/screenshot-20260306-120000.png (245820 bytes)
-#   @ /tmp/screenshot-20260306-120000.png
+#   @/tmp/screenshot-20260306-120000.png
 
 # 3. Paste the @ reference into Copilot CLI
 ```
