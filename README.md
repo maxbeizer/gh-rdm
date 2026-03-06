@@ -75,7 +75,7 @@ gh rdm paste
 # Open URL in local browser
 gh rdm open https://github.com
 
-# Fetch latest screenshot from local Desktop
+# Fetch latest screenshot from local Desktop (auto-copies @ ref to clipboard)
 gh rdm screenshot
 
 # Fetch clipboard image (use ⌘⇧⌃4 to screenshot to clipboard)
@@ -83,6 +83,9 @@ gh rdm clipboard-image
 
 # Save screenshot to a custom directory
 gh rdm screenshot -o ~/images
+
+# Disable auto-copy of @ reference
+gh rdm screenshot --copy=false
 ```
 
 ## Integrations
@@ -99,8 +102,9 @@ gh rdm screenshot
 # Output:
 #   📸 Saved: /tmp/screenshot-20260306-120000.png (245820 bytes)
 #   @/tmp/screenshot-20260306-120000.png
+#   📋 Copied to clipboard
 
-# 3. Paste the @ reference into Copilot CLI
+# 3. ⌘V to paste the @ reference into Copilot CLI
 ```
 
 Or capture directly to clipboard and pull:
