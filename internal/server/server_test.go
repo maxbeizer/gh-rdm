@@ -14,12 +14,17 @@ import (
 
 // mockRunner records calls and returns configured values.
 type mockRunner struct {
-	copiedText string
-	pasteData  []byte
-	pasteErr   error
-	openedURL  string
-	copyErr    error
-	openErr    error
+	copiedText     string
+	pasteData      []byte
+	pasteErr       error
+	openedURL      string
+	copyErr        error
+	openErr        error
+	screenshotData []byte
+	screenshotName string
+	screenshotErr  error
+	clipboardImg   []byte
+	clipboardErr   error
 }
 
 func (m *mockRunner) Copy(text string) error {
@@ -34,6 +39,14 @@ func (m *mockRunner) Paste() ([]byte, error) {
 func (m *mockRunner) Open(target string) error {
 	m.openedURL = target
 	return m.openErr
+}
+
+func (m *mockRunner) LatestScreenshot(dir string) ([]byte, string, error) {
+	return m.screenshotData, m.screenshotName, m.screenshotErr
+}
+
+func (m *mockRunner) ClipboardImage() ([]byte, error) {
+	return m.clipboardImg, m.clipboardErr
 }
 
 func sendCommand(t *testing.T, srv http.Handler, cmd client.Command) *httptest.ResponseRecorder {
@@ -118,6 +131,74 @@ func TestCopyCommandError(t *testing.T) {
 	srv := New(mock, "/tmp/test.sock", log.Default())
 
 	rec := sendCommand(t, srv, client.Command{Name: "copy", Arguments: []string{"hello"}})
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("expected 500, got %d", rec.Code)
+	}
+}
+
+func TestScreenshotCommand(t *testing.T) {
+	imgData := []byte("fake-png-data")
+	mock := &mockRunner{screenshotData: imgData, screenshotName: "Screenshot 2026-03-06.png"}
+	srv := New(mock, "/tmp/test.sock", log.Default())
+
+	rec := sendCommand(t, srv, client.Command{Name: "screenshot"})
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var resp struct {
+		Filename string `json:"filename"`
+		Data     string `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal response: %v", err)
+	}
+	if resp.Filename != "Screenshot 2026-03-06.png" {
+		t.Fatalf("expected filename %q, got %q", "Screenshot 2026-03-06.png", resp.Filename)
+	}
+}
+
+func TestScreenshotCommandError(t *testing.T) {
+	mock := &mockRunner{screenshotErr: fmt.Errorf("no screenshots")}
+	srv := New(mock, "/tmp/test.sock", log.Default())
+
+	rec := sendCommand(t, srv, client.Command{Name: "screenshot"})
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("expected 500, got %d", rec.Code)
+	}
+}
+
+func TestClipboardImageCommand(t *testing.T) {
+	imgData := []byte("fake-clipboard-png")
+	mock := &mockRunner{clipboardImg: imgData}
+	srv := New(mock, "/tmp/test.sock", log.Default())
+
+	rec := sendCommand(t, srv, client.Command{Name: "clipboard-image"})
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var resp struct {
+		Filename string `json:"filename"`
+		Data     string `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal response: %v", err)
+	}
+	if resp.Filename != "clipboard.png" {
+		t.Fatalf("expected filename %q, got %q", "clipboard.png", resp.Filename)
+	}
+}
+
+func TestClipboardImageCommandError(t *testing.T) {
+	mock := &mockRunner{clipboardErr: fmt.Errorf("no image on clipboard")}
+	srv := New(mock, "/tmp/test.sock", log.Default())
+
+	rec := sendCommand(t, srv, client.Command{Name: "clipboard-image"})
 
 	if rec.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", rec.Code)
