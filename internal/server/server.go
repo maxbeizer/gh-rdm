@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -91,6 +92,42 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
+
+	case "screenshot":
+		var dir string
+		if len(cmd.Arguments) > 0 {
+			dir = cmd.Arguments[0]
+		}
+		data, filename, err := s.host.LatestScreenshot(dir)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("screenshot failed: %v", err), http.StatusInternalServerError)
+			return
+		}
+		resp := struct {
+			Filename string `json:"filename"`
+			Data     string `json:"data"`
+		}{
+			Filename: filename,
+			Data:     base64.StdEncoding.EncodeToString(data),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+
+	case "clipboard-image":
+		data, err := s.host.ClipboardImage()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("clipboard-image failed: %v", err), http.StatusInternalServerError)
+			return
+		}
+		resp := struct {
+			Filename string `json:"filename"`
+			Data     string `json:"data"`
+		}{
+			Filename: "clipboard.png",
+			Data:     base64.StdEncoding.EncodeToString(data),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
 
 	case "stop":
 		if s.cancel != nil {
