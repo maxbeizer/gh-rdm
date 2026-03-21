@@ -1,12 +1,11 @@
-project_name: gh-rdm
+project_name: gh-extension-template
 
 builds:
-  - binary: gh-rdm
-    env:
-      - CGO_ENABLED=0
+  - binary: gh-extension-template
     goos:
       - darwin
       - linux
+      - windows
     goarch:
       - amd64
       - arm64
