@@ -31,13 +31,13 @@ This walks you through starting the server, configuring SSH forwarding in `~/.ss
 Start the server and SSH into a remote host with clipboard forwarding in one shot:
 
 ```bash
-gh rdm server & ssh -R 127.0.0.1:7391:$(gh rdm socket) user@remote-host
+gh rdm server & ssh -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socket) user@remote-host
 ```
 
 For GitHub Codespaces:
 
 ```bash
-gh rdm server & gh cs ssh -- -R 127.0.0.1:7391:$(gh rdm socket)
+gh rdm server & gh cs ssh -- -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socket)
 ```
 
 ## Usage
@@ -53,6 +53,9 @@ gh rdm socket
 
 # Stop the server
 gh rdm stop
+
+# Diagnose the server and SSH/Codespaces tunnel
+gh rdm doctor
 ```
 
 ### SSH with forwarding
@@ -60,7 +63,7 @@ gh rdm stop
 Forward the local socket to the remote host so client commands can reach it:
 
 ```bash
-ssh -R 127.0.0.1:7391:$(gh rdm socket) user@remote-host
+ssh -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socket) user@remote-host
 ```
 
 ### Client (remote machine)
