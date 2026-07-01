@@ -63,6 +63,12 @@ func TestRunDoctorCodespaceBrokenTunnelPrintsRepairCommand(t *testing.T) {
 func TestRunDoctorSSHHealthyTunnel(t *testing.T) {
 	var out bytes.Buffer
 	deps := fakeDoctorDeps()
+	deps.statSocket = func(string) error {
+		return errors.New("socket not on remote machine")
+	}
+	deps.statusUnix = func(context.Context, string) error {
+		return errors.New("server not on remote machine")
+	}
 	deps.getenv = func(key string) string {
 		if key == "SSH_CONNECTION" {
 			return "remote"
@@ -76,6 +82,9 @@ func TestRunDoctorSSHHealthyTunnel(t *testing.T) {
 	}
 
 	output := out.String()
+	if !strings.Contains(output, "checking TCP tunnel instead") {
+		t.Fatalf("runDoctor() output missing unix skip:\n%s", output)
+	}
 	if strings.Contains(output, "Repair command") {
 		t.Fatalf("runDoctor() output printed unexpected repair command:\n%s", output)
 	}

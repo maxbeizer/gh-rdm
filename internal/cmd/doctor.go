@@ -58,20 +58,25 @@ func defaultDoctorDeps() doctorDeps {
 func runDoctor(ctx context.Context, out io.Writer, deps doctorDeps) error {
 	socketPath := deps.socketPath()
 	failures := 0
+	remote := isRemoteEnvironment(deps.getenv)
 
 	fmt.Fprintln(out, "gh-rdm doctor")
 	fmt.Fprintln(out)
 	fmt.Fprintln(out, "Unix socket (this machine)")
-	if printCheck(out, "socket path exists", socketPath, deps.statSocket(socketPath)) {
-		failures++
-	}
-	if printCheck(out, "server responds over unix socket", socketPath, deps.statusUnix(ctx, socketPath)) {
-		failures++
+	if remote {
+		fmt.Fprintln(out, "  - skipped (running in SSH or Codespaces environment; checking TCP tunnel instead)")
+	} else {
+		if printCheck(out, "socket path exists", socketPath, deps.statSocket(socketPath)) {
+			failures++
+		}
+		if printCheck(out, "server responds over unix socket", socketPath, deps.statusUnix(ctx, socketPath)) {
+			failures++
+		}
 	}
 
 	fmt.Fprintln(out)
 	fmt.Fprintln(out, "Remote tunnel")
-	if isRemoteEnvironment(deps.getenv) {
+	if remote {
 		addresses := []string{
 			"localhost:" + rdmTunnelPort,
 			"127.0.0.1:" + rdmTunnelPort,
