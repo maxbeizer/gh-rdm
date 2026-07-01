@@ -37,7 +37,7 @@ gh rdm server & ssh -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socke
 For GitHub Codespaces:
 
 ```bash
-gh rdm server & gh cs ssh -- -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socket)
+gh rdm tunnel <codespace>
 ```
 
 ## Usage
@@ -56,6 +56,9 @@ gh rdm stop
 
 # Diagnose the server and SSH/Codespaces tunnel
 gh rdm doctor
+
+# Start a Codespaces tunnel to the local server
+gh rdm tunnel <codespace>
 ```
 
 ### SSH with forwarding
@@ -64,6 +67,18 @@ Forward the local socket to the remote host so client commands can reach it:
 
 ```bash
 ssh -o ExitOnForwardFailure=yes -R localhost:7391:$(gh rdm socket) user@remote-host
+```
+
+For Codespaces, let gh-rdm start the local server and tunnel for you:
+
+```bash
+gh rdm tunnel <codespace>
+```
+
+If you prefer to run the Codespaces tunnel manually:
+
+```bash
+gh rdm server & gh cs ssh -c <codespace> -- -o ExitOnForwardFailure=yes -N -R localhost:7391:$(gh rdm socket)
 ```
 
 ### Client (remote machine)
