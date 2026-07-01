@@ -22,6 +22,8 @@ func Execute(ctx context.Context, userMessages *log.Logger) error {
 		newSocketCmd(),
 		newSetupCmd(),
 		newDoctorCmd(),
+		newScreenshotCmd(),
+		newClipboardImageCmd(),
 	)
 
 	return rootCmd.ExecuteContext(ctx)

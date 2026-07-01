@@ -1,6 +1,6 @@
 # gh-rdm — Remote Development Manager
 
-A [`gh`](https://cli.github.com/) CLI extension that forwards clipboard (copy/paste) and `open` commands from remote SSH sessions back to your local machine.
+A [`gh`](https://cli.github.com/) CLI extension that forwards clipboard (copy/paste), `open` commands, and **screenshot images** from remote SSH sessions back to your local machine.
 
 Stolen from [BlakeWilliams/remote-development-manager](https://github.com/BlakeWilliams/remote-development-manager) and repackaged as a `gh` extension.
 
@@ -77,9 +77,46 @@ gh rdm paste
 
 # Open URL in local browser
 gh rdm open https://github.com
+
+# Fetch latest screenshot from local Desktop (auto-copies @ ref to clipboard)
+gh rdm screenshot
+
+# Fetch clipboard image (use ⌘⇧⌃4 to screenshot to clipboard)
+gh rdm clipboard-image
+
+# Save screenshot to a custom directory
+gh rdm screenshot -o ~/images
+
+# Disable auto-copy of @ reference
+gh rdm screenshot --copy=false
 ```
 
 ## Integrations
+
+### Screenshots & Copilot CLI over SSH
+
+When SSH'd into a Codespace, macOS screenshots reference local paths that the remote can't access.
+Use `gh rdm screenshot` to pull images through the SSH tunnel:
+
+```bash
+# 1. Take a screenshot on your Mac (⌘⇧4)
+# 2. In the Codespace terminal:
+gh rdm screenshot
+# Output:
+#   📸 Saved: /tmp/screenshot-20260306-120000.png (245820 bytes)
+#   @/tmp/screenshot-20260306-120000.png
+#   📋 Copied to clipboard
+
+# 3. ⌘V to paste the @ reference into Copilot CLI
+```
+
+Or capture directly to clipboard and pull:
+
+```bash
+# 1. Screenshot to clipboard (⌘⇧⌃4)
+# 2. In the Codespace:
+gh rdm clipboard-image
+```
 
 ### Tmux
 
