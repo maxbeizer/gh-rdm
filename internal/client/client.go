@@ -34,17 +34,14 @@ func UnixSocketPath() string {
 }
 
 func New() *Client {
+	if isRemoteEnvironment() {
+		return NewWithTCPAddress("localhost:7391")
+	}
+
 	return NewWithSocketPath(UnixSocketPath())
 }
 
 func NewWithSocketPath(socketPath string) *Client {
-	if os.Getenv("SSH_TTY") != "" || os.Getenv("SSH_CLIENT") != "" || os.Getenv("SSH_CONNECTION") != "" {
-		return &Client{
-			path:       "http://localhost:7391",
-			httpClient: http.Client{Timeout: 10 * time.Second},
-		}
-	}
-
 	return &Client{
 		path: "http://unix://" + socketPath,
 		httpClient: http.Client{
@@ -56,6 +53,21 @@ func NewWithSocketPath(socketPath string) *Client {
 			},
 		},
 	}
+}
+
+func NewWithTCPAddress(address string) *Client {
+	return &Client{
+		path:       "http://" + address,
+		httpClient: http.Client{Timeout: 10 * time.Second},
+	}
+}
+
+func isRemoteEnvironment() bool {
+	return os.Getenv("SSH_TTY") != "" ||
+		os.Getenv("SSH_CLIENT") != "" ||
+		os.Getenv("SSH_CONNECTION") != "" ||
+		os.Getenv("CODESPACES") == "true" ||
+		os.Getenv("CODESPACE_NAME") != ""
 }
 
 func (c *Client) SendCommand(ctx context.Context, commandName string, arguments ...string) ([]byte, error) {
@@ -81,5 +93,13 @@ func (c *Client) SendCommand(ctx context.Context, commandName string, arguments 
 	}
 	defer resp.Body.Close()
 
-	return io.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading response: %w", err)
+	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("server returned %s: %s", resp.Status, strings.TrimSpace(string(responseBody)))
+	}
+
+	return responseBody, nil
 }

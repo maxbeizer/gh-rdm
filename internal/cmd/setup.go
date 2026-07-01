@@ -138,7 +138,8 @@ func configureSSH(out io.Writer, hostName string) error {
 
 	socketPath := client.UnixSocketPath()
 	sshConfigPath := filepath.Join(homeDir, ".ssh", "config")
-	remoteForwardLine := fmt.Sprintf("    RemoteForward 127.0.0.1:7391 %s", socketPath)
+	remoteForwardLine := fmt.Sprintf("    RemoteForward localhost:7391 %s", socketPath)
+	exitOnForwardFailureLine := "    ExitOnForwardFailure yes"
 
 	data, err := os.ReadFile(sshConfigPath)
 	if err != nil {
@@ -147,7 +148,7 @@ func configureSSH(out io.Writer, hostName string) error {
 			if err := os.MkdirAll(filepath.Join(homeDir, ".ssh"), 0o700); err != nil {
 				return err
 			}
-			content := fmt.Sprintf("\nHost %s\n%s\n", hostName, remoteForwardLine)
+			content := fmt.Sprintf("\nHost %s\n%s\n%s\n", hostName, exitOnForwardFailureLine, remoteForwardLine)
 			if err := os.WriteFile(sshConfigPath, []byte(content), 0o644); err != nil {
 				return err
 			}
@@ -168,6 +169,7 @@ func configureSSH(out io.Writer, hostName string) error {
 		}
 		fmt.Fprintf(out, "⚠ Host '%s' exists in ~/.ssh/config but has no RemoteForward for gh-rdm.\n", hostName)
 		fmt.Fprintf(out, "  Add this line to the Host %s block:\n", hostName)
+		fmt.Fprintf(out, "  %s\n", exitOnForwardFailureLine)
 		fmt.Fprintf(out, "  %s\n", remoteForwardLine)
 		return nil
 	}
@@ -179,7 +181,7 @@ func configureSSH(out io.Writer, hostName string) error {
 	}
 	defer f.Close()
 
-	_, err = fmt.Fprintf(f, "\nHost %s\n%s\n", hostName, remoteForwardLine)
+	_, err = fmt.Fprintf(f, "\nHost %s\n%s\n%s\n", hostName, exitOnForwardFailureLine, remoteForwardLine)
 	if err != nil {
 		return err
 	}

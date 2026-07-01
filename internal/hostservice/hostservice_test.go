@@ -3,11 +3,16 @@ package hostservice
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 )
 
 func TestLatestScreenshot(t *testing.T) {
+	if runtime.GOOS != "darwin" {
+		t.Skip("screenshot capture only supported on macOS")
+	}
+
 	dir := t.TempDir()
 
 	// Create some fake screenshot files with different timestamps
